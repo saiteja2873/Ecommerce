@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                    // Ensure modern features like async/await and iterables
+    "lib": ["ESNext", "DOM"],              // Include web API types like FormData, Request, etc.
+    "module": "ESNext",                    // Keep module system modern
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "strict": true,
+    "downlevelIteration": true,            // Fix for..of over iterables like FormData.entries()
+    "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "skipLibCheck": true
+  }
+}
