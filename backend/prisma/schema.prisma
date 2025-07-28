@@ -23,6 +23,8 @@ model Product {
   name        String
   slug        String   @unique
   sku         String?  @unique
+  brand       String?
+  color       String?
   price       Float
   thumbnail   String
   images      String[]

@@ -110,7 +110,8 @@ export default function ProductDetailsPage() {
     product.variantStock.length > 0 &&
     currentVariantStock <= 0; // Treat 0 or less as out of stock
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.FormEvent) => {
+    e.preventDefault();
     if (
       product.variantStock &&
       product.variantStock.length > 0 &&
@@ -138,12 +139,17 @@ export default function ProductDetailsPage() {
     const variantInfo = selectedVariantLabel
       ? ` (${selectedVariantLabel})`
       : "";
+    console.log("Adding to cart with stock:", currentVariantStock);
     addToCart({
-      id: product.id,
+      id: `${product.id}-${selectedVariantLabel ?? "default"}`,
       name: `${product.name}${variantInfo}`,
       price: product.price,
-      imageUrl: `http://localhost:3001${product.thumbnail}`,
+      imageUrl: product.thumbnail,
+      variant: selectedVariantLabel ?? "default",
+      quantity: quantity,
+      stock: currentVariantStock, // this must match the exact stock of variant
     });
+
     toast.success(`${quantity} x ${product.name}${variantInfo} added to cart!`);
     setQuantity(1);
   };
@@ -166,14 +172,14 @@ export default function ProductDetailsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
           {/* Image section */}
-          <div className="flex flex-col gap-4 sticky top-10 md:top-12">
+          <div className="flex flex-col gap-4 sticky top-10 md:top-12 ">
             <div className="relative w-full aspect-square border border-gray-700 rounded-xl overflow-hidden bg-zinc-800 shadow-xl">
               <Image
                 src={selectedImage || "/images/fallback.png"}
                 alt={product.name}
                 fill
                 className="object-contain object-top"
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes="(max-width: 639px) 100vw, (max-width: 1023px) 100vw, (max-width: 1279px) 50vw, 50vw"
                 priority
               />
             </div>
@@ -184,7 +190,7 @@ export default function ProductDetailsPage() {
                 {product.images.map((img, index) => (
                   <div
                     key={index}
-                    className={`flex-shrink-0 w-16 h-16 sm:w-28 sm:h-28 relative border rounded-md cursor-pointer transition-all duration-200 ${
+                    className={`flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 relative border rounded-md cursor-pointer transition-all duration-200 ${
                       selectedImage === `http://localhost:3001${img}`
                         ? "border-blue-400 ring-2 ring-blue-400"
                         : "border-gray-700 hover:border-gray-500"
@@ -311,8 +317,8 @@ export default function ProductDetailsPage() {
                 Add to Cart
               </button>
               <button
-                onClick={() => {
-                  handleAddToCart();
+                onClick={(e) => {
+                  handleAddToCart(e);
                   if (
                     !isOutOfStock &&
                     quantity > 0 &&

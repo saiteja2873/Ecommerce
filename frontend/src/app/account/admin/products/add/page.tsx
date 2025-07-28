@@ -122,7 +122,7 @@ const AddProductForm = () => {
     setAiDescriptionError("");
 
     try {
-      const prompt = `Generate a compelling and concise product description for a product named "${formData.name}", color "${formData.color}, brand : "${formData.brand}". Use these keywords/brief description: "${aiDescriptionPrompt}". Focus on features, benefits, and appeal to customers. Keep it under 30 words in a concise way for marketing.`;
+      const prompt = `Generate a compelling and concise product description for a product named "${formData.name}", color "${formData.color}, brand : "${formData.brand}". Use these keywords/brief description: "${aiDescriptionPrompt}". Focus on features, benefits, and appeal to customers. Keep it under 30 words in a concise way for marketing and generated text should not contain asterisk.`;
 
       const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
       const payload = { contents: chatHistory };

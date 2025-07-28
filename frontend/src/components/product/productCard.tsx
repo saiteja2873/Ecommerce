@@ -1,3 +1,4 @@
+// src/components/product/productCard.tsx
 "use client";
 
 import Image from "next/image";
@@ -21,6 +22,9 @@ export default function ProductCard({ id, name, price, image }: ProductCardProps
             src={image}
             alt={name}
             fill
+            priority={true}
+            // ✅ ADDED: SIZES PROP ONLY
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover object-top transition-transform duration-500 will-change-transform group-hover:scale-105"
           />
         </div>

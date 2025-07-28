@@ -43,7 +43,7 @@ export default function RootLayout({
           <Header />
           <GlobalLoader/>
           {/* <BackButton /> */}
-          <main className="flex-grow pb-16">{children}</main>
+          <main className="mb-10 md:mb-0">{children}</main>
           <BottomNav />
         </CartProvider>
       </body>
