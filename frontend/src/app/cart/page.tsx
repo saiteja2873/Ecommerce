@@ -7,6 +7,7 @@ import { useCartContext } from "@/context/cartContext";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import {
   ShoppingCart,
   Trash2,
@@ -45,12 +46,16 @@ export default function CartPage() {
   const { cartItems, removeFromCart, clearCart, updateCartItemQuantity } =
     useCartContext();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    setSelectedItems(
-      cartItems.map((item) => `${item.id}-${item.variant ?? "default"}`)
-    );
-  }, [cartItems]);
+    // Only initialize selection if nothing is selected yet
+    if (cartItems.length > 0 && selectedItems.length === 0) {
+      setSelectedItems(
+        cartItems.map((item) => `${item.id}-${item.variant ?? "default"}`)
+      );
+    }
+  }, [cartItems, selectedItems]);
 
   const toggleSelection = (id: string, variant: string | undefined) => {
     const key = `${id}-${variant ?? "default"}`;
@@ -391,6 +396,7 @@ export default function CartPage() {
                       Clear Cart
                     </motion.button>
                     <motion.button
+                      onClick={() => router.push("/checkout")}
                       whileTap={{ scale: 0.97, backgroundColor: "#059669" }}
                       whileHover={{
                         scale: 1.07,
