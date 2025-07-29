@@ -106,7 +106,6 @@ export default function CartPage() {
         }}
         className="pointer-events-none z-0 fixed inset-0"
         style={{
-          // ✅ MODIFIED: Simpler gradient, less blur, using Tailwind colors
           background:
             "radial-gradient(ellipse 150% 100% at 80% 5%, var(--tw-gradient-from-rgb) 0%, var(--tw-gradient-via-rgb) 20%, transparent 100%)",
           filter: "blur(70px)", // Slightly less blur

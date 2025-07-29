@@ -16,7 +16,7 @@ type CartItem = {
 
 type CartContextType = {
   cartItems: CartItem[];
-  addToCart: (item: CartItem) => void;
+  addToCart: (item: CartItem) => boolean;
   removeFromCart: (productId: string, variant?: string) => void;
   clearCart: () => void;
   setCartItems: (items: CartItem[]) => void;
@@ -53,48 +53,65 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [cartItems]);
 
-  const addToCart = (item: CartItem) => {
-    setCartItems((prev) => {
-      const existing = prev.find((p) => p.id === item.id); // id already includes variant
+const addToCart = (item: CartItem): boolean => {
+  let success = false;
 
-      if (existing) {
-        const updatedQty = existing.quantity + item.quantity;
+  if (item.quantity <= 0) {
+    // ❌ Skip adding items with invalid quantity
+    toast.error("Invalid quantity to add.");
+    return false;
+  }
 
-        if (updatedQty > item.stock) {
-          toast.error(`Cannot add more than available stock (${item.stock}).`);
-          return prev;
-        }
+  setCartItems((prev) => {
+    const existing = prev.find((p) => p.id === item.id);
 
-        return prev.map((p) =>
-          p.id === item.id ? { ...p, quantity: updatedQty } : p
-        );
-      }
+    if (existing) {
+      const updatedQty = existing.quantity + item.quantity;
 
-      if (item.quantity > item.stock) {
+      // ✅ Don't exceed stock
+      if (updatedQty > item.stock) {
         toast.error(`Cannot add more than available stock (${item.stock}).`);
         return prev;
       }
 
-      return [...prev, item];
-    });
-  };
+      success = true;
+      return prev.map((p) =>
+        p.id === item.id ? { ...p, quantity: updatedQty } : p
+      );
+    }
+
+    // ✅ Check stock for new item
+    if (item.quantity > item.stock) {
+      toast.error(`Cannot add more than available stock (${item.stock}).`);
+      return prev;
+    }
+
+    success = true;
+    return [...prev, item];
+  });
+
+  return success;
+};
 
   const updateCartItemQuantity = (
     id: string,
-    variant: string | undefined,
+    variant: string | undefined, // can ignore if variant is embedded in id
     delta: number
   ) => {
     setCartItems((prev) => {
       let changed = false;
+
       const updatedCart = prev.map((item) => {
         if (item.id === id) {
           const newQuantity = item.quantity + delta;
 
-          if (newQuantity > item.stock) {
+          // ✅ Only show stock error when increasing
+          if (delta > 0 && newQuantity > item.stock) {
             toast.error(`Only ${item.stock} items in stock.`);
             return item;
           }
 
+          // ✅ Prevent quantity from going below 1
           if (newQuantity < 1) {
             toast.error("Quantity must be at least 1.");
             return item;
@@ -111,8 +128,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const removeFromCart = (id: string) => {
-  setCartItems((prev) => prev.filter((item) => item.id !== id));
-};
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  };
 
   const clearCart = () => setCartItems([]);
 
