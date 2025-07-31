@@ -143,15 +143,15 @@ productRoutes.get("/new", async (c) => {
       },
     });
 
-    console.log("✅ Products fetched from DB:", products);
+    // console.log("✅ Products fetched from DB:", products);
 
     const transformedProducts = products.map((p) => {
       const fullImagePath = `http://localhost:3001${p.thumbnail}`;
-      console.log("🖼️ Processing product image:", {
-        title: p.name,
-        originalThumbnail: p.thumbnail,
-        fullImagePath,
-      });
+      // console.log("🖼️ Processing product image:", {
+      //   title: p.name,
+      //   originalThumbnail: p.thumbnail,
+      //   fullImagePath,
+      // });
       return {
         ...p,
         image: fullImagePath,

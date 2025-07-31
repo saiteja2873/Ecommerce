@@ -1,13 +1,8 @@
+// src/app/layout.tsx
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
-import BottomNav from "@/components/layout/bottomNav";
-import { CartProvider } from "@/context/cartContext"; // ✅ Import this
-import GlobalLoader from "@/components/layout/globalLoader";
-import BackButton from "@/components/layout/backButton";
+import { Geist, Geist_Mono } from "next/font/google";
+import ClientLayout from "@/components/layout/clientLayout"; // ✅ You will create this next
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,24 +23,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" className="scroll-smooth">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-black text-black dark:text-white`}
       >
-        <Toaster position="top-right" />
-
-        {/* ✅ Wrap everything in CartProvider */}
-        <CartProvider>
-          <Header />
-          <GlobalLoader/>
-          {/* <BackButton /> */}
-          <main className="mb-10 md:mb-0">{children}</main>
-          <BottomNav />
-        </CartProvider>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );

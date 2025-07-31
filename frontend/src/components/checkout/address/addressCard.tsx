@@ -1,4 +1,3 @@
-// src/components/checkout/AddressCard.tsx
 "use client";
 
 import { Address } from "./addressTypes";
@@ -36,6 +35,20 @@ export default function AddressCard({
   isSelected,
   onSelect,
 }: AddressCardProps) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onSelect();
+    }
+  };
+
+  const handleEditClick = (
+    e: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>
+  ) => {
+    e.stopPropagation();
+    onEdit(address);
+  };
+
   return (
     <motion.div
       role="radio"
@@ -53,7 +66,7 @@ export default function AddressCard({
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
       onClick={onSelect}
-      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onSelect()}
+      onKeyDown={handleKeyDown}
     >
       <Glass className="p-3 flex flex-col gap-3">
         {/* Top Row */}
@@ -75,13 +88,11 @@ export default function AddressCard({
           <motion.button
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.03 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(address);
-            }}
-            tabIndex={0}
-            aria-label={`Edit address ${address.fullName}`}
-            className="text-cyan-400 hover:text-cyan-200 hover:bg-cyan-900/30 rounded px-2 py-0.5 text-xs flex items-center gap-1"
+            type="button"
+            onClick={handleEditClick}
+            onKeyDown={(e) => e.stopPropagation()}
+            aria-label={`Edit address for ${address.fullName}`}
+            className="text-cyan-400 hover:text-cyan-200 hover:bg-cyan-900/30 rounded px-2 py-0.5 text-xs flex items-center gap-1 focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300"
           >
             <Edit className="w-3.5 h-3.5" /> Edit
           </motion.button>
