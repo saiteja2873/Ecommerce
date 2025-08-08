@@ -6,7 +6,7 @@ import AddressCard from "./addressCard";
 import EditAddressForm from "./editAddressForm";
 import { Address } from "./addressTypes";
 import AddNewAddress from "./addNewAddress";
-import { getSavedAddresses, saveAddresses } from "./utils";
+import { getSavedAddresses } from "./utils";
 import { motion, AnimatePresence, Variants, Transition } from "framer-motion";
 import { Plus, MapPin } from "lucide-react";
 
@@ -32,17 +32,17 @@ export default function AddressSection({ onHeightChange }: { onHeightChange?: ()
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
 
-  useEffect(() => {
-    const loadedAddresses = getSavedAddresses();
+useEffect(() => {
+  const fetchAddresses = async () => {
+    const loadedAddresses = await getSavedAddresses();
     setAddresses(loadedAddresses);
     if (loadedAddresses.length > 0) {
       setSelectedId(loadedAddresses[0].id);
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    saveAddresses(addresses);
-  }, [addresses]);
+  fetchAddresses();
+}, []);
 
   const handleSelect = (id: string) => setSelectedId(id);
 

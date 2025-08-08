@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { Address } from "./addressTypes"; // Assuming this path and type are correct
-import { getSavedAddresses, saveAddresses } from "./utils"; // Assuming these utilities exist
+// import { getSavedAddresses, saveAddresses } from "./utils"; // Assuming these utilities exist
 import { motion } from "framer-motion"; // For animations
 import { toast } from "react-hot-toast"; // For user feedback
 
@@ -81,21 +81,37 @@ export default function AddNewAddress({ onAdd, onCancel }: Props) {
     }
 
     try {
-      const res = await fetch("/api/address/add", {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please log in first.");
+        return;
+      }
+
+      const res = await fetch("http://localhost:3001/api/address/add", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, userId: "REPLACE_WITH_USER_ID" }), // Replace this dynamically
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(form),
       });
 
       const data = await res.json();
+      console.log("Response:", data);
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Something went wrong");
+        if (data.error === "Address already exists") {
+          toast.error("Address already exists.");
+        } else {
+          toast.error(data.error || "Something went wrong.");
+        }
+        return;
       }
 
       toast.success("Address added successfully!");
-      onAdd(data.address); // Pass the saved address from backend
+      onAdd(data.address); // Pass saved address back to parent
 
+      // Clear form
       setForm({
         fullName: "",
         phone: "",

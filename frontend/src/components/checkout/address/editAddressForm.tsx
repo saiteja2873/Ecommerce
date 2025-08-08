@@ -9,7 +9,11 @@ interface EditAddressFormProps {
   onSave: (updatedAddress: Address) => void;
 }
 
-export default function EditAddressForm({ address, onCancel, onSave }: EditAddressFormProps) {
+export default function EditAddressForm({
+  address,
+  onCancel,
+  onSave,
+}: EditAddressFormProps) {
   const [form, setForm] = useState<Address>(address);
 
   useEffect(() => {
@@ -21,22 +25,48 @@ export default function EditAddressForm({ address, onCancel, onSave }: EditAddre
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(form);
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        "http://localhost:3001/api/address/update/me",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // if you're using auth
+          },
+          body: JSON.stringify(form),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to update address");
+      }
+
+      onSave(result.address); // Notify parent with updated address
+    } catch (error) {
+      console.error("Error updating address:", error);
+      alert("Failed to update address. Please try again.");
+    }
   };
 
   return (
     <div className="p-4 border rounded-md bg-gray-900 shadow-md space-y-4">
-      <h3 className="text-lg font-semibold">Edit Address</h3>
+      <h3 className="text-lg font-semibold text-white">Edit Address</h3>
       <form onSubmit={handleSubmit} className="space-y-3">
         <input
           type="text"
-          name="name"
+          name="fullName"
           placeholder="Full Name"
           value={form.fullName}
           onChange={handleChange}
           className="w-full p-2 border rounded-md"
+          required
         />
         <input
           type="text"
@@ -45,11 +75,12 @@ export default function EditAddressForm({ address, onCancel, onSave }: EditAddre
           value={form.phone}
           onChange={handleChange}
           className="w-full p-2 border rounded-md"
+          required
         />
         <input
           type="text"
-          name="addressLine"
-          placeholder="Address Line"
+          name="addressLine1"
+          placeholder="Address Line 1"
           value={form.addressLine1}
           onChange={handleChange}
           className="w-full p-2 border rounded-md"
@@ -57,9 +88,9 @@ export default function EditAddressForm({ address, onCancel, onSave }: EditAddre
         />
         <input
           type="text"
-          name="addressLine"
-          placeholder="Address Line"
-          value={form.addressLine2}
+          name="addressLine2"
+          placeholder="Address Line 2"
+          value={form.addressLine2 || ""}
           onChange={handleChange}
           className="w-full p-2 border rounded-md"
         />
@@ -70,6 +101,7 @@ export default function EditAddressForm({ address, onCancel, onSave }: EditAddre
           value={form.city}
           onChange={handleChange}
           className="w-full p-2 border rounded-md"
+          required
         />
         <input
           type="text"
@@ -78,13 +110,21 @@ export default function EditAddressForm({ address, onCancel, onSave }: EditAddre
           value={form.pincode}
           onChange={handleChange}
           className="w-full p-2 border rounded-md"
+          required
         />
 
         <div className="flex justify-end space-x-2">
-          <button type="button" onClick={onCancel} className="px-4 py-2 border rounded-md">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 border rounded-md text-white"
+          >
             Cancel
           </button>
-          <button type="submit" className="px-4 py-2 bg-black text-white rounded-md">
+          <button
+            type="submit"
+            className="px-4 py-2 bg-black text-white rounded-md"
+          >
             Save
           </button>
         </div>

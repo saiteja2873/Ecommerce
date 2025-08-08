@@ -1,22 +1,32 @@
 // src/components/checkout/utils.ts
 import { Address } from "./addressTypes";
 
-const ADDRESSES_STORAGE_KEY = "savedAddresses";
+export const getSavedAddresses = async (): Promise<Address[]> => {
+  if (typeof window === "undefined") return [];
 
-export const getSavedAddresses = (): Address[] => {
-  if (typeof window === "undefined") return []; // Ensure runs only on client
-  const stored = localStorage.getItem(ADDRESSES_STORAGE_KEY);
-  try {
-    return stored ? JSON.parse(stored) : [];
-  } catch (e) {
-    console.error("Failed to parse addresses from localStorage:", e);
-    localStorage.removeItem(ADDRESSES_STORAGE_KEY); // Clear corrupted data
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.warn("User not logged in. No token found.");
     return [];
   }
-};
 
-export const saveAddresses = (addresses: Address[]): void => {
-  if (typeof window !== "undefined") {
-    localStorage.setItem(ADDRESSES_STORAGE_KEY, JSON.stringify(addresses));
+  try {
+    const res = await fetch("http://localhost:3001/api/address/user/me", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || "Failed to fetch addresses");
+    }
+
+    return data.addresses || [];
+  } catch (error) {
+    console.error("Error fetching addresses from DB:", error);
+    return [];
   }
 };
