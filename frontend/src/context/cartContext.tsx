@@ -1,8 +1,8 @@
-// src/context/cartContext.tsx
 "use client";
-import toast from "react-hot-toast";
 
+import toast from "react-hot-toast";
 import { createContext, useContext, useEffect, useState } from "react";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
 
 type CartItem = {
   id: string;
@@ -31,93 +31,128 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { jwt } = useAuthStatus();
 
+  // ✅ Fetch cart only if JWT exists
   useEffect(() => {
-    const stored = localStorage.getItem("cart");
-    if (stored) {
+    if (!jwt) return;
+
+    const fetchCart = async () => {
       try {
-        setCartItems(JSON.parse(stored));
-      } catch (e) {
-        console.error("Failed to parse cart from localStorage:", e);
-        localStorage.removeItem("cart");
+        const res = await fetch("http://localhost:3001/api/cart", {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Failed to fetch cart");
+        }
+
+        const data = await res.json();
+        setCartItems(data.items);
+      } catch (err: any) {
+        console.error("Failed to fetch cart:", err);
+        toast.error("Could not load cart");
       }
+    };
+
+    fetchCart();
+  }, [jwt]);
+
+  const addToCart = (item: CartItem): boolean => {
+    if (!jwt) {
+      toast.error("You must be logged in to add to cart.");
+      return false;
     }
-  }, []);
 
-  useEffect(() => {
-    if (
-      cartItems.length > 0 ||
-      localStorage.getItem("cart") !== JSON.stringify([])
-    ) {
-      localStorage.setItem("cart", JSON.stringify(cartItems));
+    if (item.quantity <= 0) {
+      toast.error("Invalid quantity.");
+      return false;
     }
-  }, [cartItems]);
 
-const addToCart = (item: CartItem): boolean => {
-  let success = false;
+    const existing = cartItems.find((p) => p.id === item.id);
 
-  if (item.quantity <= 0) {
-    // ❌ Skip adding items with invalid quantity
-    toast.error("Invalid quantity to add.");
-    return false;
-  }
+    const newQuantity = existing
+      ? existing.quantity + item.quantity
+      : item.quantity;
 
-  setCartItems((prev) => {
-    const existing = prev.find((p) => p.id === item.id);
+    if (newQuantity > item.stock) {
+      toast.error(`Only ${item.stock} items in stock.`);
+      return false;
+    }
 
-    if (existing) {
-      const updatedQty = existing.quantity + item.quantity;
+    const [productId, variantLabel] = item.id.split("-");
 
-      // ✅ Don't exceed stock
-      if (updatedQty > item.stock) {
-        toast.error(`Cannot add more than available stock (${item.stock}).`);
-        return prev;
+    fetch("http://localhost:3001/api/cart", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        productId,
+        variantLabel,
+        quantity: item.quantity,
+        thumbnail: item.imageUrl,
+      }),
+    }).catch((err) => {
+      console.error("Add to cart failed:", err);
+      toast.error("Failed to add item to cart.");
+    });
+
+    setCartItems((prev) => {
+      if (existing) {
+        return prev.map((p) =>
+          p.id === item.id ? { ...p, quantity: newQuantity } : p
+        );
       }
+      return [...prev, item];
+    });
 
-      success = true;
-      return prev.map((p) =>
-        p.id === item.id ? { ...p, quantity: updatedQty } : p
-      );
-    }
-
-    // ✅ Check stock for new item
-    if (item.quantity > item.stock) {
-      toast.error(`Cannot add more than available stock (${item.stock}).`);
-      return prev;
-    }
-
-    success = true;
-    return [...prev, item];
-  });
-
-  return success;
-};
+    return true;
+  };
 
   const updateCartItemQuantity = (
     id: string,
-    variant: string | undefined, // can ignore if variant is embedded in id
+    variant: string | undefined,
     delta: number
   ) => {
+    if (!jwt) return; // ✅ Guard against sync when logged out
+
     setCartItems((prev) => {
       let changed = false;
 
       const updatedCart = prev.map((item) => {
-        if (item.id === id) {
+        if (item.id === id && item.variant === variant) {
           const newQuantity = item.quantity + delta;
 
-          // ✅ Only show stock error when increasing
           if (delta > 0 && newQuantity > item.stock) {
             toast.error(`Only ${item.stock} items in stock.`);
             return item;
           }
 
-          // ✅ Prevent quantity from going below 1
           if (newQuantity < 1) {
             toast.error("Quantity must be at least 1.");
             return item;
           }
 
           changed = true;
+
+          fetch("http://localhost:3001/api/cart", {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+            },
+            body: JSON.stringify({
+              productId: id,
+              variantLabel: variant,
+              quantity: newQuantity,
+            }),
+          }).catch((err) => console.error("Failed to update cart item:", err));
+
           return { ...item, quantity: newQuantity };
         }
         return item;
@@ -127,11 +162,36 @@ const addToCart = (item: CartItem): boolean => {
     });
   };
 
-  const removeFromCart = (id: string) => {
+  const removeFromCart = (id: string, variant?: string) => {
+    if (!jwt) return;
+
+    fetch("http://localhost:3001/api/cart", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        productId: id,
+        variantLabel: variant,
+      }),
+    }).catch((err) => console.error("Failed to remove item:", err));
+
     setCartItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const clearCart = () => setCartItems([]);
+  const clearCart = () => {
+    if (!jwt) return;
+
+    fetch("http://localhost:3001/api/cart/clear", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    }).catch((err) => console.error("Failed to clear cart:", err));
+
+    setCartItems([]); // Only affects local UI — not dangerous
+  };
 
   return (
     <CartContext.Provider

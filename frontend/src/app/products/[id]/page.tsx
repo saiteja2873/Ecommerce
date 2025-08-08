@@ -8,7 +8,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
 import { useLoaderStore } from "@/context/loaderStore";
 import toast from "react-hot-toast";
+import { useAuthStatus } from "@/hooks/useAuthStatus"; // adjust path if needed
 // import ProductGrid from "@/components/product/productGrid";
+
+
 
 type Product = {
   id: string;
@@ -32,6 +35,7 @@ type Product = {
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
+  const { isAuthenticated } = useAuthStatus(); // outside the function
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get("query");
@@ -170,6 +174,12 @@ export default function ProductDetailsPage() {
     ): boolean => {
       e?.preventDefault();
 
+      if (!isAuthenticated) {
+        toast.error("You must be logged in to add to cart.");
+        router.push("/account/login"); // or "/auth/login" if that's your route
+        return false;
+      }
+
       if (
         product.variantStock &&
         product.variantStock.length > 0 &&
@@ -178,11 +188,12 @@ export default function ProductDetailsPage() {
         toast.error("Please select a variant.");
         return false;
       }
+
       if (quantity <= 0) {
         toast.error("Quantity must be at least 1.");
         return false;
       }
-      // ✅ NEW/MODIFIED: Check against total possible quantity (in cart + attempting to add)
+
       if (wouldExceedStock && currentVariantStock > 0) {
         toast.error(
           `Adding ${quantity} would exceed available stock. Only ${
@@ -191,7 +202,7 @@ export default function ProductDetailsPage() {
         );
         return false;
       }
-      // If currentVariantStock is 0, it means it's totally out of stock
+
       if (
         currentVariantStock <= 0 &&
         product.variantStock &&
@@ -205,20 +216,21 @@ export default function ProductDetailsPage() {
         ? ` (${selectedVariantLabel})`
         : "";
       const cartItem = {
-        id: cartItemId, // Use the pre-calculated composite ID
+        id: cartItemId,
         name: `${product.name}${variantInfo}`,
         price: product.price,
         imageUrl: product.thumbnail,
         variant: selectedVariantLabel ?? "default",
-        quantity: quantity, // Quantity user wants to add
-        stock: currentVariantStock, // Current available stock of this variant
+        quantity: quantity,
+        stock: currentVariantStock,
       };
 
-      const addedSuccessfully = addToCart(cartItem); // This calls CartContext's addToCart
+      const addedSuccessfully = addToCart(cartItem);
 
       if (addedSuccessfully) {
-        setQuantity(1); // Reset quantity only if successfully added
+        setQuantity(1);
       }
+
       return addedSuccessfully;
     };
 

@@ -20,8 +20,7 @@ authRoute.post("/login", async (c) => {
 
   if (!parse.success) {
     return c.json(
-      { message: "Invalid input", details: z.treeifyError(parse.error)
- },
+      { message: "Invalid input", details: z.treeifyError(parse.error) },
       400
     );
   }
@@ -60,12 +59,14 @@ authRoute.post("/login", async (c) => {
       email: user.email,
       image: user.image || null,
       role: user.role.toString(),
+      loginMethod: "manual", // ✅ added this field
     });
   } catch (err) {
     console.error("Login error:", err);
     return c.json({ message: "Internal Server Error" }, 500);
   }
 });
+
 
 
 

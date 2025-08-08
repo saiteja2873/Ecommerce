@@ -1,26 +1,49 @@
-// hooks/useAuthStatus.ts
+// src/hooks/useAuthStatus.ts
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 export function useAuthStatus() {
-  const { data: session, status } = useSession();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loginMethod, setLoginMethod] = useState<"token" | "google" | null>(null);
+  const { data: session, status } = useSession(); // Google login
+  const [authResolved, setAuthResolved] = useState(false);
+  const [jwt, setJwt] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [loginMethod, setLoginMethod] = useState<"manual" | "google" | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const resolveAuth = () => {
+      const token = localStorage.getItem("token");
+      const loginMethodStored = localStorage.getItem("loginMethod");
 
-    if (token) {
-      setIsLoggedIn(true);
-      setLoginMethod("token");
-    } else if (status === "authenticated" && session?.user?.email) {
-      setIsLoggedIn(true);
-      setLoginMethod("google");
-    } else {
-      setIsLoggedIn(false);
+      if (token && loginMethodStored === "manual") {
+        setJwt(token);
+        setEmail(null);
+        setLoginMethod("manual");
+        setAuthResolved(true);
+        return;
+      }
+
+      if (status === "authenticated" && session?.user?.email) {
+        setJwt(token);
+        setEmail(session.user.email);
+        setLoginMethod("google");
+        setAuthResolved(true);
+        return;
+      }
+
+      // Default: not logged in
+      setJwt(null);
+      setEmail(null);
       setLoginMethod(null);
-    }
-  }, [session, status]);
+      setAuthResolved(true);
+    };
 
-  return { isLoggedIn, loginMethod, session, status };
+    if (status !== "loading") {
+      resolveAuth();
+    }
+  }, [status, session]);
+
+  // ✅ ADDED: Derive isAuthenticated here
+  const isAuthenticated = !!jwt || !!email;
+
+  return { jwt, email, authResolved, loginMethod, isAuthenticated }; // ✅ Return isAuthenticated
 }

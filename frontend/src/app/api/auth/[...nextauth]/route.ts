@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import type { NextAuthOptions } from "next-auth";
-import { getServerSession } from "next-auth";
 
 // Define authOptions before using it
 export const authOptions: NextAuthOptions = {
@@ -21,7 +20,7 @@ export const authOptions: NextAuthOptions = {
         token.role = "USER";
 
         try {
-          await fetch("http://localhost:3001/api/users/sync", {
+          const res = await fetch("http://localhost:3001/api/users/sync", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -31,6 +30,11 @@ export const authOptions: NextAuthOptions = {
               role: "USER",
             }),
           });
+
+          const data = await res.json();
+          if (data.success && data.token) {
+            token.backendToken = data.token; // ✅ store backend JWT
+          }
         } catch (error) {
           console.error("User sync failed", error);
         }
@@ -46,6 +50,7 @@ export const authOptions: NextAuthOptions = {
         session.user.name = token.name as string | null | undefined;
         session.user.image = token.image as string | null | undefined;
         (session.user as any).role = token.role; // if you extended user type with 'role'
+        (session.user as any).token = token.backendToken;
       }
 
       return session;

@@ -8,6 +8,7 @@ import searchRoute from './routes/searchRoutes';
 import userRoute from './routes/users';
 import authRoute from './routes/auth';
 import verifyRouter from './routes/verify';
+import cartRoute from './routes/cart';
 
 const app = new Hono();
 
@@ -27,5 +28,6 @@ app.route('/api/search', searchRoute)
 app.route("/api/users", userRoute);
 app.route("/api/auth", authRoute);
 app.route("/api/verify", verifyRouter);
+app.route("/api/cart", cartRoute)
 
 export default app;

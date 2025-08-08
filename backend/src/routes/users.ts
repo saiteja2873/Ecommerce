@@ -6,15 +6,17 @@ import { authMiddleware } from "../lib/authMiddleware";
 const userRoute = new Hono();
 const prisma = new PrismaClient(); // ✅ Instantiate Prisma client
 
+import { sign } from "hono/jwt"; // or your preferred JWT lib
+
 userRoute.post("/sync", async (c) => {
   const body = await c.req.json();
   const { email, name, image, role } = body;
 
   try {
-    const existing = await prisma.user.findUnique({ where: { email } });
+    let user = await prisma.user.findUnique({ where: { email } });
 
-    if (!existing) {
-      await prisma.user.create({
+    if (!user) {
+      user = await prisma.user.create({
         data: {
           email,
           name,
@@ -24,7 +26,17 @@ userRoute.post("/sync", async (c) => {
       });
     }
 
-    return c.json({ success: true });
+    // Generate JWT token using user's ID + email
+    const token = await sign(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+      process.env.JWT_SECRET || "your-secret-here" // Use a secure secret
+    );
+
+    return c.json({ success: true, token });
   } catch (err) {
     console.error("User sync error:", err);
     return c.json({ success: false, error: "Internal Server Error" }, 500);
@@ -33,14 +45,14 @@ userRoute.post("/sync", async (c) => {
 
 
 userRoute.get("/profile", authMiddleware, async (c) => {
-  const payload = c.get("jwtPayload"); // `authMiddleware` sets this
-  if (!payload || !payload.id) {
+  const user = c.get("user"); // `authMiddleware` sets this
+  if (!user?.id || user.id.length !== 24) {
     return c.json({ error: "Unauthorized" }, 401);
   }
 
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: payload.id },
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
       select: {
         id: true,
         name: true,
@@ -56,7 +68,7 @@ userRoute.get("/profile", authMiddleware, async (c) => {
       return c.json({ error: "User not found" }, 404);
     }
 
-    return c.json({ user });
+    return c.json({ user : dbUser });
   } catch (err) {
     console.error("Fetch profile error:", err);
     return c.json({ error: "Internal Server Error" }, 500);

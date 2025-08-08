@@ -205,8 +205,14 @@ export default function CartPage() {
                             className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border border-cyan-800 bg-blend-multiply group-hover:ring-2 hover:ring-cyan-300 transition"
                           >
                             <Image
-                              src={item.imageUrl}
-                              alt={item.name}
+                              src={
+                                item.imageUrl?.startsWith("http")
+                                  ? item.imageUrl
+                                  : item.imageUrl
+                                  ? `http://localhost:3001${item.imageUrl}`
+                                  : "/placeholder.jpg" // fallback image if null or undefined
+                              }
+                              alt={item.name || "Product image"}
                               fill
                               className="object-cover object-top group-hover:scale-105 transition-transform"
                               sizes="(max-width: 768px) 96px, 112px"

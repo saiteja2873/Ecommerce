@@ -33,7 +33,14 @@ export default function LoginPage() {
     if (res?.error) {
       toast.error("Invalid credentials");
     } else {
+      // ✅ Save login method as manual
+      localStorage.setItem("loginMethod", "manual");
       toast.success("Welcome back!");
+
+      // Optionally store email if needed in your app
+      // localStorage.setItem("email", form.email);
+
+      // ✅ Delay redirect slightly so toast can be seen
       setTimeout(() => {
         router.push("/");
       }, 1000);
