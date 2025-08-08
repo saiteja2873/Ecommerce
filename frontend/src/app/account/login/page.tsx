@@ -8,29 +8,36 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    try {
-      const res = await fetch("http://localhost:3001/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const res = await fetch("http://localhost:3001/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-      if (!res.ok) throw new Error("Login failed");
-
-      const data = await res.json();
-
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("loginMethod", data.loginMethod)
-      router.push("/account/profile");
-    } catch (err) {
-      alert("Invalid credentials");
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Login failed");
     }
-  };
+
+    const data = await res.json();
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("loginMethod", data.loginMethod);
+
+    // Redirect and reload page
+    window.location.href = "/account/profile";
+  } catch (err) {
+    console.error("Login error:", err);
+    alert("Invalid credentials");
+  }
+};
+
 
   return (
     <div className="max-w-md mx-auto mt-16 p-6 bg-white dark:bg-neutral-900 shadow rounded">

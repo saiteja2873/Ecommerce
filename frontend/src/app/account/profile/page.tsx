@@ -73,8 +73,6 @@ export default function ProfilePage() {
   }, [authResolved, loginMethod, jwt, email, router]);
 
   // ✅ Logout handler
-  const { clearCart } = useCartContext(); // ⬅️ add this at the top of the component
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("loginMethod");
@@ -83,12 +81,13 @@ export default function ProfilePage() {
 
     if (loginMethod === "google") {
       signOut({ callbackUrl: "/account/login" }); // next-auth logout
+      window.location.href = "/";
     } else {
       router.push("/account/login"); // manual logout
+      window.location.href = "/";
     }
   };
 
-  // ✅ Show loading while resolving auth or fetching user
   if (!authResolved || loading) {
     return <div className="p-6">Loading...</div>;
   }
