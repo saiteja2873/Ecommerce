@@ -54,6 +54,7 @@ model Address {
 
   fullName     String   // Full name of recipient
   phone        String   // Contact number
+  email        String
   addressLine1 String   // Primary address
   addressLine2 String?  // Optional additional info
   city         String
@@ -170,6 +171,7 @@ model CartItem {
 
   @@index([cartId])
   @@index([productId])
+  @@unique([cartId, productId, variantLabel])
 }
 
 

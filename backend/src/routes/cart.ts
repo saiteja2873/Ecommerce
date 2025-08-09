@@ -99,6 +99,7 @@ cartRoute.patch("/", async (c) => {
     return c.json({ error: "Missing productId or quantity" }, 400);
   }
 
+  const [actualProductId, tempVariant] = productId.split("-")
   // Fetch the user's cart
   const cart = await db.cart.findFirst({ where: { userId: user.id } });
   if (!cart) return c.json({ error: "Cart not found" }, 404);
@@ -108,7 +109,7 @@ cartRoute.patch("/", async (c) => {
   const item = await db.cartItem.findFirst({
     where: {
       cartId: cart.id,
-      productId,
+      productId : actualProductId,
       variantLabel: variantLabel ?? null, // null if no variant
     },
   });
@@ -134,30 +135,41 @@ cartRoute.patch("/", async (c) => {
   return c.json(updatedItem);
 });
 
-// ❌ REMOVE ITEM
 cartRoute.delete("/", async (c) => {
   const user = c.get("user");
   if (!user?.id) return c.json({ error: "Unauthorized" }, 401);
 
-  const { productId, variantLabel } = await c.req.json();
+  const { key, variant } = await c.req.json();
+  if (!key) return c.json({ error: "Invalid productId" }, 400);
 
-  const cart = await db.cart.findFirst({ where: { userId: user.id } });
+  // If key contains a hyphen, take only the first part
+  const productId = key.includes("-") ? key.split("-")[0] : key;
+
+  // Find the cart for the logged-in user
+  const cart = await db.cart.findFirst({
+    where: { userId: user.id },
+  });
   if (!cart) return c.json({ error: "Cart not found" }, 404);
 
+  // Find the cart item with matching cartId, productId, and variantLabel
   const item = await db.cartItem.findFirst({
     where: {
       cartId: cart.id,
-      productId,
-      variantLabel: variantLabel ?? null,
+      productId: productId,
+      variantLabel: variant ?? null,
     },
   });
 
   if (!item) return c.json({ error: "Item not found in your cart" }, 404);
 
-  await db.cartItem.delete({ where: { id: item.id } });
+  // Delete it
+  await db.cartItem.delete({
+    where: { id: item.id },
+  });
 
   return c.json({ success: true });
 });
+
 
 // 🧹 CLEAR CART (optional, if called by frontend)
 cartRoute.post("/clear", async (c) => {

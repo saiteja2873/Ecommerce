@@ -163,6 +163,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const removeFromCart = (id: string, variant?: string) => {
+    // console.log("Clicked Delete in frontend")
     if (!jwt) return;
 
     fetch("http://localhost:3001/api/cart", {
@@ -172,12 +173,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
-        productId: id,
-        variantLabel: variant,
+        key: id,
+        variant : variant ?? "default",
       }),
-    }).catch((err) => console.error("Failed to remove item:", err));
+    });
 
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+    setCartItems((prev) => prev.filter((item) => !(item.id === id && item.variant === variant)));
   };
 
   const clearCart = () => {

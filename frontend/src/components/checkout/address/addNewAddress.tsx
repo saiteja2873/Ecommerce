@@ -39,6 +39,7 @@ export default function AddNewAddress({ onAdd, onCancel }: Props) {
     // Use Omit<Address, 'id'> for form state
     fullName: "", // Changed from 'name' to 'fullName'
     phone: "",
+    email: "",
     addressLine1: "", // Changed from 'addressLine'
     addressLine2: "", // Added optional address line
     city: "",
@@ -115,6 +116,7 @@ export default function AddNewAddress({ onAdd, onCancel }: Props) {
       setForm({
         fullName: "",
         phone: "",
+        email : "",
         addressLine1: "",
         addressLine2: "",
         city: "",
@@ -175,6 +177,27 @@ export default function AddNewAddress({ onAdd, onCancel }: Props) {
             />
             {errors.phone && <p className={errorClasses}>{errors.phone}</p>}
           </div>
+        </div>
+
+        {/* Email */}
+
+        <div>
+          <label htmlFor="email" className={labelClasses}>
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="omegon@gmail.com"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className={inputClasses}
+          />
+          {errors.addressLine1 && (
+            <p className={errorClasses}>{errors.addressLine1}</p>
+          )}
         </div>
 
         {/* Address Line 1 & 2 */}

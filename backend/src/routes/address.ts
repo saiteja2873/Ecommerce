@@ -21,6 +21,7 @@ addressRoute.post("/add", async (c) => {
       where: {
         userId: user.id,
         fullName: formData.fullName,
+        email: formData.email,
         phone: formData.phone,
         addressLine1: formData.addressLine1,
         addressLine2: formData.addressLine2,

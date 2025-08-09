@@ -2,6 +2,7 @@
 export type Address = {
   id: string; // Added for unique identification
   fullName: string;
+  email : string;
   phone: string; // Added phone based on your form
   addressLine1: string;
   addressLine2?: string; // Optional

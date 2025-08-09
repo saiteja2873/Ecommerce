@@ -77,6 +77,17 @@ export default function EditAddressForm({
           className="w-full p-2 border rounded-md"
           required
         />
+
+
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            className="w-full p-2 border rounded-md"
+            required
+          />
         <input
           type="text"
           name="addressLine1"
