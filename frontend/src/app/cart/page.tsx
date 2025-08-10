@@ -48,17 +48,41 @@ export default function CartPage() {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const router = useRouter();
 
+  // Load saved selections when component mounts
   useEffect(() => {
-    // Only initialize selection if nothing is selected yet
-    if (cartItems.length > 0 && selectedItems.length === 0) {
-      setSelectedItems(
-        cartItems.map((item) => `${item.id}-${item.variant ?? "default"}`)
-      );
+    const storedSelection = localStorage.getItem("selectedItems");
+    if (storedSelection) {
+      setSelectedItems(JSON.parse(storedSelection));
     }
-  }, [cartItems, selectedItems]);
+  }, []);
+
+  // Whenever cart changes, merge in any new items immediately
+  useEffect(() => {
+    setSelectedItems((prev) => {
+      const prevSet = new Set(prev);
+      let updated = false;
+
+      cartItems.forEach((item) => {
+        const key = item.id.includes("-")
+          ? item.id
+          : `${item.id}-${item.variant ?? "default"}`;
+        if (!prevSet.has(key)) {
+          prevSet.add(key);
+          updated = true;
+        }
+      });
+
+      return updated ? Array.from(prevSet) : prev;
+    });
+  }, [cartItems]);
+
+  // Sync to localStorage
+  useEffect(() => {
+    localStorage.setItem("selectedItems", JSON.stringify(selectedItems));
+  }, [selectedItems]);
 
   const toggleSelection = (id: string, variant: string | undefined) => {
-    const key = `${id}-${variant ?? "default"}`;
+    const key = id.includes("-") ? id : `${id}-${variant ?? "default"}`;
     setSelectedItems((prev) =>
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
@@ -169,8 +193,17 @@ export default function CartPage() {
               <motion.ul variants={containerVariants} className="space-y-8">
                 <AnimatePresence>
                   {cartItems.map((item, i) => {
-                    const key = `${item.id}-${item.variant ?? "default"}`;
-                    const productId = item.id.split("-")[0]; // Assuming ID format
+                    // Always generate a consistent unique key
+                    const key = item.id.includes("-")
+                      ? item.id
+                      : `${item.id}-${item.variant ?? "default"}`;
+
+                    // Get base product ID (strip anything after first hyphen if it exists)
+                    const productId = item.id.includes("-")
+                      ? item.id.split("-")[0]
+                      : item.id;
+
+                    // Check if selected
                     const selected = selectedItems.includes(key);
 
                     return (

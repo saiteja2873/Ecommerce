@@ -6,7 +6,6 @@ import { useAuthStatus } from "@/hooks/useAuthStatus";
 import { signOut } from "next-auth/react";
 import { useCartContext } from "@/context/cartContext";
 
-
 type User = {
   id: string;
   name: string;
@@ -73,18 +72,42 @@ export default function ProfilePage() {
   }, [authResolved, loginMethod, jwt, email, router]);
 
   // ✅ Logout handler
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("loginMethod");
-    localStorage.removeItem("cart");
-    // clearCart(); // 🧹 clear cart from context state immediately
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-    if (loginMethod === "google") {
-      signOut({ callbackUrl: "/account/login" }); // next-auth logout
-      window.location.href = "/";
-    } else {
-      router.push("/account/login"); // manual logout
-      window.location.href = "/";
+      // Call backend logout for manual logins
+      if (token && loginMethod !== "google") {
+        await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/logout`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+
+      // Clear local storage/session
+      localStorage.removeItem("token");
+      localStorage.removeItem("loginMethod");
+      localStorage.removeItem("cart");
+      // clearCart(); // If using context
+
+      if (loginMethod === "google") {
+        // Google login via NextAuth
+        await signOut({ callbackUrl: "/account/login" });
+        window.location.href = "/";
+      } else {
+        router.push("/account/login");
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Still clear data locally in case of API failure
+      localStorage.removeItem("token");
+      localStorage.removeItem("loginMethod");
+      localStorage.removeItem("cart");
+      router.push("/account/login");
     }
   };
 

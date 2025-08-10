@@ -5,6 +5,7 @@ import AddressSection from "./address/addressSection";
 import PlaceOrderButton from "./placeOrderButton";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Truck, ListChecks, CreditCard } from "lucide-react";
+import ReviewOrderSection from "./reviewOrderSection";
 
 const steps = [
   { number: 1, label: "Shipping", icon: <Truck size={18} /> },
@@ -51,11 +52,12 @@ export default function CheckoutForm() {
               >
                 <div
                   className={`flex items-center justify-center rounded-full w-9 h-9 border-2 transition-all
-                    ${step === s.number
-                      ? "border-blue-600 bg-blue-600 text-white"
-                      : step > s.number
-                      ? "border-emerald-500 bg-emerald-500 text-white"
-                      : "border-slate-300 bg-slate-100 text-slate-400"
+                    ${
+                      step === s.number
+                        ? "border-blue-600 bg-blue-600 text-white"
+                        : step > s.number
+                        ? "border-emerald-500 bg-emerald-500 text-white"
+                        : "border-slate-300 bg-slate-100 text-slate-400"
                     }`}
                 >
                   {s.icon}
@@ -102,12 +104,16 @@ export default function CheckoutForm() {
                 exit="exit"
                 className="py-2"
               >
-                <h2 className="text-xl font-semibold mb-2 text-white">
+                {/* <h2 className="text-xl font-semibold mb-2 text-white">
                   Review your order
                 </h2>
-                <p className="text-slate-400">Review your items and total here.</p>
+                <p className="text-slate-400 mb-4">
+                  Review your items and total here.
+                </p> */}
+                <ReviewOrderSection />
               </motion.div>
             )}
+
             {step === 3 && (
               <motion.div
                 key="payment"

@@ -8,6 +8,8 @@ import { db } from "../lib/db";
 
 const authRoute = new Hono();
 const prisma = new PrismaClient();
+const tokenBlacklist = new Set<string>();
+
 
 const loginSchema = z.object({
   email: z.email(),
@@ -67,7 +69,20 @@ authRoute.post("/login", async (c) => {
   }
 });
 
+authRoute.post("/logout", async (c) => {
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
 
+  const token = authHeader.split(" ")[1];
+  tokenBlacklist.add(token); // Invalidate this token
+
+  return c.json({ message: "Logged out successfully" });
+});
+
+// ✅ Middleware helper to check blacklist
+export const isTokenBlacklisted = (token: string) => tokenBlacklist.has(token);
 
 
 

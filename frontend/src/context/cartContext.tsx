@@ -163,23 +163,42 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const removeFromCart = (id: string, variant?: string) => {
-    // console.log("Clicked Delete in frontend")
-    if (!jwt) return;
+  if (!jwt) return;
 
-    fetch("http://localhost:3001/api/cart", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify({
-        key: id,
-        variant : variant ?? "default",
-      }),
-    });
+  // Build the correct key
+  const key = id.includes("-") ? id : `${id}-${variant ?? "default"}`;
 
-    setCartItems((prev) => prev.filter((item) => !(item.id === id && item.variant === variant)));
-  };
+  // Remove from selectedItems in localStorage
+  const storedSelected = JSON.parse(localStorage.getItem("selectedItems") || "[]");
+  const updatedSelected = storedSelected.filter((itemKey: string) => itemKey !== key);
+  localStorage.setItem("selectedItems", JSON.stringify(updatedSelected));
+
+  // Remove from cartItems in localStorage
+  const storedCart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+  const updatedCart = storedCart.filter(
+    (item: any) => !(item.id === id && item.variant === variant)
+  );
+  localStorage.setItem("cartItems", JSON.stringify(updatedCart));
+
+  // Update frontend state
+  setCartItems((prev) =>
+    prev.filter((item) => !(item.id === id && item.variant === variant))
+  );
+
+  // Backend delete request
+  fetch("http://localhost:3001/api/cart", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`,
+    },
+    body: JSON.stringify({
+      key: id,
+      variant: variant ?? "default",
+    }),
+  });
+};
+
 
   const clearCart = () => {
     if (!jwt) return;

@@ -5,6 +5,10 @@ import { PrismaClient } from "../generated/prisma";
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET!;
 
+// Temporary in-memory token blacklist
+// Use Redis or DB in production
+const tokenBlacklist = new Set<string>();
+
 interface JWTPayload {
   id: string;
   email?: string;
@@ -21,6 +25,11 @@ export const authMiddleware: MiddlewareHandler = async (c, next) => {
   }
 
   const token = authHeader.split(" ")[1];
+
+  // 🚫 Check blacklist before verifying
+  if (tokenBlacklist.has(token)) {
+    return c.json({ error: "Token has been invalidated" }, 401);
+  }
 
   try {
     const payload = await verify(token, JWT_SECRET) as unknown as JWTPayload;
@@ -42,4 +51,18 @@ export const authMiddleware: MiddlewareHandler = async (c, next) => {
     console.error("JWT verification failed:", err);
     return c.json({ error: "Invalid or expired token" }, 403);
   }
+};
+
+// ✅ Logout route — blacklists token
+export const logoutHandler: MiddlewareHandler = async (c) => {
+  const authHeader = c.req.header("Authorization");
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  const token = authHeader.split(" ")[1];
+  tokenBlacklist.add(token);
+
+  return c.json({ message: "Logged out successfully" });
 };
