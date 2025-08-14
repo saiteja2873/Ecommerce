@@ -35,30 +35,28 @@ export const authOptions: NextAuthOptions = {
 
           const data = await res.json();
           if (data.success && data.token) {
-            token.backendToken = data.token; // store backend JWT
+            token.backendToken = data.token;
           }
         } catch (error) {
           console.error("User sync failed", error);
         }
       }
-
       return token;
     },
 
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id;
+        (session.user as any).id = token.id;
         session.user.email = token.email ?? null;
         session.user.name = token.name ?? null;
         session.user.image = token.image ?? null;
-        session.user.role = token.role;
-        session.user.backendToken = token.backendToken;
+        (session.user as any).role = token.role;
+        (session.user as any).backendToken = token.backendToken;
       }
-
       return session;
     },
 
-    async redirect({  baseUrl }) {
+    async redirect({ baseUrl }) {
       return baseUrl;
     },
   },
@@ -70,5 +68,7 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
+// ✅ Wrap in request handlers for App Router
 const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+export const GET = handler;
+export const POST = handler;
