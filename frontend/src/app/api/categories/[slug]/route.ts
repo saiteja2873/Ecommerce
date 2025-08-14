@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// Define params as a Promise per official Next.js v15 convention
+type Params = Promise<{ id: string }>;
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  context: { params: Params }
 ): Promise<NextResponse> {
-  const { slug } = await params;
+  const { id } = await context.params;
 
   try {
     const backendRes = await fetch(
-      `https://ecommerce-j5j0.onrender.com/api/categories/${encodeURIComponent(slug)}`,
+      `https://ecommerce-j5j0.onrender.com/api/products/${encodeURIComponent(id)}`,
       {
-        method: "GET",
         headers: { "Content-Type": "application/json" },
       }
     );
@@ -22,10 +24,10 @@ export async function GET(
       );
     }
 
-    const data: { products: unknown } = await backendRes.json();
-    return NextResponse.json({ products: data.products });
-  } catch (error) {
-    console.error("Error fetching from backend:", error);
+    const data = await backendRes.json();
+    return NextResponse.json(data);
+  } catch (err) {
+    console.error("Error fetching from backend:", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
