@@ -9,7 +9,7 @@ export async function GET(
   const { slug } = await Promise.resolve(params);
 
   try {
-    const backendRes = await fetch(`http://localhost:3001/api/categories/${slug}`, {
+    const backendRes = await fetch(`https://ecommerce-j5j0.onrender.com/api/categories/${slug}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

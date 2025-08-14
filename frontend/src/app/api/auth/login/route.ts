@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     // Call your backend's login route
-    const backendRes = await fetch("http://localhost:3001/api/auth/login", {
+    const backendRes = await fetch("https://ecommerce-j5j0.onrender.com/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),

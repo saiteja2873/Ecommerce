@@ -81,7 +81,7 @@ export async function updateProfile(token: string, updates: EditableUserFields):
 
 // Upload user profile image
 export async function uploadProfileImage(token: string, file: File): Promise<string> {
-  const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
+  const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://ecommerce-j5j0.onrender.com";
 
   const formData = new FormData();
   formData.append("image", file);

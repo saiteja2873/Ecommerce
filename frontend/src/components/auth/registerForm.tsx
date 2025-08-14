@@ -29,7 +29,7 @@ export default function RegisterForm() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("http://localhost:3001/api/auth/register", {
+      const res = await fetch("https://ecommerce-j5j0.onrender.com/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -60,7 +60,7 @@ export default function RegisterForm() {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/api/verify?email=${form.email}&otp=${otp}`,
+        `https://ecommerce-j5j0.onrender.com/api/verify?email=${form.email}&otp=${otp}`,
         {
           method: "GET",
           credentials: "include",

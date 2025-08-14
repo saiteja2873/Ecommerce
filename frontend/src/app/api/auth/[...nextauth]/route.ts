@@ -20,7 +20,7 @@ export const authOptions: NextAuthOptions = {
         token.role = "USER";
 
         try {
-          const res = await fetch("http://localhost:3001/api/users/sync", {
+          const res = await fetch("https://ecommerce-j5j0.onrender.com/api/users/sync", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

@@ -59,7 +59,7 @@ export default function ProductDetailsPage() {
 
     try {
       if (id && typeof id === "string" && !query) {
-        const res = await fetch(`http://localhost:3001/api/products/${id}`);
+        const res = await fetch(`https://ecommerce-j5j0.onrender.com/api/products/${id}`);
         if (res.ok) {
           const data = await res.json();
           if (data?.product) {
@@ -89,7 +89,7 @@ export default function ProductDetailsPage() {
       }
 
       const resList = await fetch(
-        `http://localhost:3001/api/products/search?query=${encodeURIComponent(
+        `https://ecommerce-j5j0.onrender.com/api/products/search?query=${encodeURIComponent(
           searchQuery
         )}`
       );
@@ -270,16 +270,16 @@ export default function ProductDetailsPage() {
                     <div
                       key={index}
                       className={`flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 relative border rounded-md cursor-pointer transition-all duration-200 ${
-                        selectedImage === `http://localhost:3001${img}`
+                        selectedImage === `https://ecommerce-j5j0.onrender.com${img}`
                           ? "border-blue-400 ring-2 ring-blue-400"
                           : "border-gray-700 hover:border-gray-500"
                       }`}
                       onClick={() =>
-                        setSelectedImage(`http://localhost:3001${img}`)
+                        setSelectedImage(`https://ecommerce-j5j0.onrender.com${img}`)
                       }
                     >
                       <Image
-                        src={`http://localhost:3001${img}`}
+                        src={`https://ecommerce-j5j0.onrender.com${img}`}
                         alt={`${product.name} thumbnail ${index + 1}`}
                         fill
                         className="object-cover object-top rounded"

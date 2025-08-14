@@ -96,11 +96,14 @@ export default function CartPage() {
     updateCartItemQuantity(id, variant, delta);
   };
 
-  const totalAmount = cartItems
-    .filter((item) =>
-      selectedItems.includes(`${item.id}-${item.variant ?? "default"}`)
-    )
-    .reduce((sum, item) => sum + item.price * item.quantity, 0);
+const normalizeId = (id: string, variant?: string) =>
+  id.includes("-") ? id : `${id}-${variant ?? "default"}`;
+
+const totalAmount = cartItems
+  .filter((item) =>
+    selectedItems.includes(normalizeId(item.id, item.variant))
+  )
+  .reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   // Motion Variants
   const containerVariants = {
@@ -112,6 +115,385 @@ export default function CartPage() {
     visible: {
       opacity: 1,
       y: 0,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
       scale: 1,
       transition: { type: "spring", stiffness: 100, damping: 15 },
     }, // ✅ Smoother spring transition
@@ -194,18 +576,18 @@ export default function CartPage() {
                 <AnimatePresence>
                   {cartItems.map((item, i) => {
                     // Always generate a consistent unique key
-                    const key = item.id.includes("-")
-                      ? item.id
-                      : `${item.id}-${item.variant ?? "default"}`;
+                    const productId = item.id?.split("-")[0] ?? "unknown";
 
-                    // Get base product ID (strip anything after first hyphen if it exists)
-                    const productId = item.id.includes("-")
-                      ? item.id.split("-")[0]
-                      : item.id;
+                    // Ensure variant is always defined
+                    const variantId = item.variant ?? "default";
 
-                    // Check if selected
-                    const selected = selectedItems.includes(key);
+                    // Unique key: productId + variantId + index
+                    const key = `${productId}-${variantId}`;
 
+                    // Selection check
+                    const selected = selectedItems.includes(
+                      `${productId}-${variantId}`
+                    );
                     return (
                       <motion.li
                         layout="position" // ✅ Optimized layout prop
@@ -242,7 +624,7 @@ export default function CartPage() {
                                 item.imageUrl?.startsWith("http")
                                   ? item.imageUrl
                                   : item.imageUrl
-                                  ? `http://localhost:3001${item.imageUrl}`
+                                  ? `https://ecommerce-j5j0.onrender.com${item.imageUrl}`
                                   : "/placeholder.jpg" // fallback image if null or undefined
                               }
                               alt={item.name || "Product image"}

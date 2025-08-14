@@ -6,6 +6,8 @@ import PlaceOrderButton from "./placeOrderButton";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Truck, ListChecks, CreditCard } from "lucide-react";
 import ReviewOrderSection from "./reviewOrderSection";
+import PaymentSection from "../payment/paymentSection";
+import { usePaymentContext } from "@/context/paymentContext"; // ✅ import context
 
 const steps = [
   { number: 1, label: "Shipping", icon: <Truck size={18} /> },
@@ -23,16 +25,17 @@ export default function CheckoutForm() {
   const [step, setStep] = useState(1);
   const totalSteps = steps.length;
 
+  const { paymentAmount } = usePaymentContext(); // ✅ Get the stored amount
+
   const nextStep = () => setStep((prev) => Math.min(prev + 1, totalSteps));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
   const footerRef = useRef<HTMLDivElement | null>(null);
 
-  // Called when address form is added
   const handleAddressHeightChange = () => {
     setTimeout(() => {
       footerRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-    }, 100); // short delay to allow rendering
+    }, 100);
   };
 
   return (
@@ -104,16 +107,9 @@ export default function CheckoutForm() {
                 exit="exit"
                 className="py-2"
               >
-                {/* <h2 className="text-xl font-semibold mb-2 text-white">
-                  Review your order
-                </h2>
-                <p className="text-slate-400 mb-4">
-                  Review your items and total here.
-                </p> */}
                 <ReviewOrderSection />
               </motion.div>
             )}
-
             {step === 3 && (
               <motion.div
                 key="payment"
@@ -123,10 +119,8 @@ export default function CheckoutForm() {
                 exit="exit"
                 className="py-2"
               >
-                <h2 className="text-xl font-semibold mb-2 text-white">
-                  Payment Information
-                </h2>
-                <p className="text-slate-400">Enter your payment details.</p>
+                <PaymentSection amount={paymentAmount} />{" "}
+                {/* ✅ Use actual amount */}
               </motion.div>
             )}
           </AnimatePresence>

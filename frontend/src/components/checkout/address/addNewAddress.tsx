@@ -88,7 +88,7 @@ export default function AddNewAddress({ onAdd, onCancel }: Props) {
         return;
       }
 
-      const res = await fetch("http://localhost:3001/api/address/add", {
+      const res = await fetch("https://ecommerce-j5j0.onrender.com/api/address/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

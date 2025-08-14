@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const backendRes = await fetch(`http://localhost:3001/api/products/${params.id}`);
+    const backendRes = await fetch(`https://ecommerce-j5j0.onrender.com/api/products/${params.id}`);
 
     if (!backendRes.ok) {
       throw new Error("Failed to fetch product from backend");

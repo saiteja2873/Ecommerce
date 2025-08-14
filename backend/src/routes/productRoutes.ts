@@ -146,7 +146,7 @@ productRoutes.get("/new", async (c) => {
     // console.log("✅ Products fetched from DB:", products);
 
     const transformedProducts = products.map((p) => {
-      const fullImagePath = `http://localhost:3001${p.thumbnail}`;
+      const fullImagePath = `https://ecommerce-j5j0.onrender.com${p.thumbnail}`;
       // console.log("🖼️ Processing product image:", {
       //   title: p.name,
       //   originalThumbnail: p.thumbnail,
@@ -295,7 +295,7 @@ productRoutes.get('/search', async (c) => {
 
     const transformedProducts = products.map(p => ({
       ...p,
-      thumbnail: `${process.env.BACKEND_URL || 'http://localhost:3001'}${p.thumbnail}`, // Ensure full URL
+      thumbnail: `${process.env.BACKEND_URL || 'https://ecommerce-j5j0.onrender.com'}${p.thumbnail}`, // Ensure full URL
     }));
 
     return c.json({ products: transformedProducts }, 200);
@@ -334,7 +334,7 @@ productRoutes.get("/:id", async (c) => {
       success: true,
       product: {
         ...product,
-        thumbnail: `http://localhost:3001${product.thumbnail}`,
+        thumbnail: `http://localhost:${product.thumbnail}`,
       },
     });
   } catch (err) {

@@ -6,8 +6,8 @@ export async function GET(request: NextRequest) {
   const category = request.nextUrl.searchParams.get("category");
 
   const backendURL = category
-    ? `http://localhost:3001/api/products?category=${category}`
-    : "http://localhost:3001/api/products";
+    ? `https://ecommerce-j5j0.onrender.com/api/products?category=${category}`
+    : "https://ecommerce-j5j0.onrender.com/api/products";
 
   try {
     const res = await fetch(backendURL);
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData(); // ✅ handles multipart data
 
-    const res = await fetch("http://localhost:3001/api/products", {
+    const res = await fetch("https://ecommerce-j5j0.onrender.com/api/products", {
       method: "POST",
       body: formData, // ✅ directly forward the formData
     });

@@ -39,7 +39,7 @@ searchRoute.get('/', async (c) => {
 
     const transformedProducts = products.map(p => ({
       ...p,
-      image: `http://localhost:3001${p.thumbnail}`, // ✅ Transform thumbnail to 'image' for frontend Product type
+      image: `https://ecommerce-j5j0.onrender.com${p.thumbnail}`, // ✅ Transform thumbnail to 'image' for frontend Product type
     }));
 
     return c.json({ products: transformedProducts }, 200);

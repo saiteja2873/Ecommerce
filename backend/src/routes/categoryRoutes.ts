@@ -27,7 +27,7 @@ categoryRoutes.get('/:slug', async (c) => {
   return c.json({ 
     products: category.products.map((p) => ({
     ...p,
-    image: `http://localhost:3001${p.thumbnail}`,
+    image: `https://ecommerce-j5j0.onrender.com${p.thumbnail}`,
   })), // ✅ Return in object
 });
 });

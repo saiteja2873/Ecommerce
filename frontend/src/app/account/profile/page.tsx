@@ -41,14 +41,14 @@ export default function ProfilePage() {
         let res: Response;
 
         if (loginMethod === "manual" && jwt) {
-          res = await fetch("http://localhost:3001/api/users/profile", {
+          res = await fetch("https://ecommerce-j5j0.onrender.com/api/users/profile", {
             headers: {
               Authorization: `Bearer ${jwt}`,
               "Content-Type": "application/json",
             },
           });
         } else if (loginMethod === "google" && email) {
-          res = await fetch("http://localhost:3001/api/users/by-email", {
+          res = await fetch("https://ecommerce-j5j0.onrender.com/api/users/by-email", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email }),

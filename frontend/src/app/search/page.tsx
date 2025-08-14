@@ -36,7 +36,7 @@ export default function SearchResultsPage() {
     setError(null);
 
     try {
-      const res = await fetch(`http://localhost:3001/api/products/search?query=${encodeURIComponent(query)}`);
+      const res = await fetch(`https://ecommerce-j5j0.onrender.com/api/products/search?query=${encodeURIComponent(query)}`);
 
       if (!res.ok) {
         const errorText = await res.text();

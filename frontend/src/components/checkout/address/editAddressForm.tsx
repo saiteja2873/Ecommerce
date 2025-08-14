@@ -31,7 +31,7 @@ export default function EditAddressForm({
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:3001/api/address/update/me",
+        "https://ecommerce-j5j0.onrender.com/api/address/update/me",
         {
           method: "PUT",
           headers: {

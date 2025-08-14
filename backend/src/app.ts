@@ -10,6 +10,7 @@ import authRoute from './routes/auth';
 import verifyRouter from './routes/verify';
 import cartRoute from './routes/cart';
 import addressRoute from './routes/address';
+import { payment } from './routes/payment';
 
 const app = new Hono();
 
@@ -31,5 +32,6 @@ app.route("/api/auth", authRoute);
 app.route("/api/verify", verifyRouter);
 app.route("/api/cart", cartRoute);
 app.route("/api/address", addressRoute);
+app.route("/api/payment", payment);
 
 export default app;

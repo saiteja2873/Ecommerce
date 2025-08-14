@@ -11,7 +11,7 @@ export const getSavedAddresses = async (): Promise<Address[]> => {
   }
 
   try {
-    const res = await fetch("http://localhost:3001/api/address/user/me", {
+    const res = await fetch("https://ecommerce-j5j0.onrender.com/api/address/user/me", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

@@ -12,7 +12,7 @@ const handleLogin = async (e: React.FormEvent) => {
   e.preventDefault();
 
   try {
-    const res = await fetch("http://localhost:3001/api/auth/login", {
+    const res = await fetch("https://ecommerce-j5j0.onrender.com/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

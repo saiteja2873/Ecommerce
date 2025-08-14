@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useCartContext } from "@/context/cartContext";
+import { usePaymentContext } from "@/context/paymentContext"; // ✅ Import payment context
 import Image from "next/image";
 
 const ReviewOrder: React.FC = () => {
   const { cartItems } = useCartContext();
+  const { setPaymentAmount } = usePaymentContext(); // ✅ Access setter from payment context
 
   // Get selected items from localStorage
   const storedSelected: string[] = JSON.parse(
@@ -22,7 +24,7 @@ const ReviewOrder: React.FC = () => {
   const getImageSrc = (path?: string) => {
     if (!path) return "/placeholder.png";
     if (path.startsWith("http://") || path.startsWith("https://")) return path;
-    return `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}${path}`;
+    return `${process.env.NEXT_PUBLIC_API_URL || "https://ecommerce-j5j0.onrender.com"}${path}`;
   };
 
   // Calculate totals
@@ -30,8 +32,13 @@ const ReviewOrder: React.FC = () => {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-  const shipping = subtotal > 1000 ? 0 : 99; // Example: free shipping over ₹1000
+  const shipping = subtotal > 1000 ? 0 : 99;
   const totalPrice = subtotal + shipping;
+
+  // ✅ Sync totalPrice with payment context
+  useEffect(() => {
+    setPaymentAmount(totalPrice);
+  }, [totalPrice, setPaymentAmount]);
 
   const formatPrice = (price: number) =>
     price.toLocaleString("en-IN", { style: "currency", currency: "INR" });
@@ -96,7 +103,7 @@ const ReviewOrder: React.FC = () => {
         )}
       </section>
 
-      {/* Order Summary at the bottom */}
+      {/* Order Summary */}
       {selectedCartItems.length > 0 && (
         <aside className="bg-white border border-gray-100 rounded-2xl shadow-md p-5 sm:p-6 mt-8">
           <h2 className="text-lg sm:text-xl font-bold mb-4 text-gray-800">
@@ -121,9 +128,16 @@ const ReviewOrder: React.FC = () => {
             <span>{formatPrice(totalPrice)}</span>
           </div>
 
-          {/* <button className="mt-6 w-full bg-black text-white font-medium py-3 rounded-xl hover:bg-gray-800 transition">
+          {/* Payment Button */}
+          <button
+            className="mt-6 w-full bg-black text-white font-medium py-3 rounded-xl hover:bg-gray-800 transition"
+            onClick={() => {
+              // In future: navigate to payment page
+              console.log("Proceed to Payment with amount:", totalPrice);
+            }}
+          >
             Proceed to Payment
-          </button> */}
+          </button>
         </aside>
       )}
     </div>

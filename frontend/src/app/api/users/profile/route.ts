@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const backendRes = await fetch("http://localhost:3001/api/users/profile", {
+    const backendRes = await fetch("https://ecommerce-j5j0.onrender.com/api/users/profile", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -38,7 +38,7 @@ export async function PUT(req: NextRequest) {
   const body = await req.json();
 
   try {
-    const backendRes = await fetch("http://localhost:3001/api/users/profile", {
+    const backendRes = await fetch("https://ecommerce-j5j0.onrender.com/api/users/profile", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
