@@ -1,4 +1,6 @@
 // app/not-found.tsx
+"use client";
+
 import { Suspense } from "react";
 import NotFoundClient from "@/components/not-found/notFoundClient";
 
