@@ -18,7 +18,7 @@ type Product = {
 
 export default function CategoryPage() {
   const { slug } = useParams();
-  const router = useRouter();
+  // const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const { setLoading } = useLoaderStore();
 
@@ -37,7 +37,7 @@ export default function CategoryPage() {
     }
 
     if (slug) fetchProducts();
-  }, [slug]);
+  }, [slug, setLoading]);
 
   return (
     <div className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto">

@@ -9,7 +9,7 @@ export default function TokenSync() {
 
   useEffect(() => {
     if (session?.user) {
-      const token = (session.user as any).token;
+      const token = session.user.backendToken
       if (token) {
         localStorage.setItem("token", token);
         localStorage.setItem("loginMethod", "google");

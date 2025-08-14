@@ -29,14 +29,17 @@ export default function RegisterForm() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("https://ecommerce-j5j0.onrender.com/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const res = await fetch(
+        "https://ecommerce-j5j0.onrender.com/api/auth/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        }
+      );
 
       if (!res.ok) {
-        const errorData = await res.json();
+        const errorData: { message?: string } = await res.json();
         if (res.status === 409) {
           toast.error("User with this email already exists.");
         } else {
@@ -46,9 +49,13 @@ export default function RegisterForm() {
       }
 
       toast.success("Registered! Enter the OTP sent to your email.");
-      setShowOtpInput(true); // 👈 Show OTP field
-    } catch (err: any) {
-      toast.error(err.message || "Unexpected error.");
+      setShowOtpInput(true);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Unexpected error.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -67,22 +74,25 @@ export default function RegisterForm() {
         }
       );
 
-      const data = await res.json();
+      const data: { message?: string; token?: string } = await res.json();
 
       if (!res.ok) {
         toast.error(data.message || "Invalid or expired OTP.");
         return;
       }
 
-      // Optional: store token to localStorage
       if (data.token) {
         localStorage.setItem("token", data.token);
       }
 
       toast.success("Email verified! Redirecting...");
       router.push("/");
-    } catch (err: any) {
-      toast.error("Verification failed.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Verification failed.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -167,7 +177,9 @@ export default function RegisterForm() {
             className="w-full px-3 py-2 bg-black border border-gray-600 rounded-md text-white"
             disabled={isSubmitting}
           />
-          <p className="text-sm text-gray-500">Must be at least 8 characters.</p>
+          <p className="text-sm text-gray-500">
+            Must be at least 8 characters.
+          </p>
         </>
       )}
 

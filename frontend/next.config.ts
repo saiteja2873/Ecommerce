@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
         port: "3001",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "ecommerce-j5j0.onrender.com",
+        pathname: "/uploads/**",
+      },
     ],
   },
 };

@@ -215,8 +215,9 @@ const AddProductForm = () => {
 
       toast.success("Product added successfully!");
       router.push("/account/admin/dashboard");
-    } catch (err: any) {
-      toast.error(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast.error(`Error: ${message}`);
     }
   };
 
@@ -397,7 +398,7 @@ const AddProductForm = () => {
             Generate Description with AI
           </h3>
           <p className="text-sm text-gray-300">
-            Provide keywords or a brief idea, then click "Generate".
+            {`Provide keywords or a brief idea, then click "Generate".`}
           </p>
           <div>
             <label htmlFor="aiDescriptionPrompt" className="sr-only">

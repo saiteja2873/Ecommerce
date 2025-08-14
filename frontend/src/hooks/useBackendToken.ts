@@ -6,7 +6,7 @@ export function useBackendToken() {
 
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
-      const token = (session.user as any).token;
+      const token = session.user.backendToken
 
       if (token) {
         localStorage.setItem("token", token);

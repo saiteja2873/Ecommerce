@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
 import { signOut } from "next-auth/react";
-import { useCartContext } from "@/context/cartContext";
+// import { useCartContext } from "@/context/cartContext";
 
 type User = {
   id: string;

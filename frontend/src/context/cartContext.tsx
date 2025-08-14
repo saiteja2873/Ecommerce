@@ -37,26 +37,32 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!jwt) return;
 
-    const fetchCart = async () => {
-      try {
-        const res = await fetch("https://ecommerce-j5j0.onrender.com/api/cart", {
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-          },
-        });
+  const fetchCart = async () => {
+  try {
+    const res = await fetch("https://ecommerce-j5j0.onrender.com/api/cart", {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.error || "Failed to fetch cart");
-        }
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Failed to fetch cart");
+    }
 
-        const data = await res.json();
-        setCartItems(data.items);
-      } catch (err: any) {
-        console.error("Failed to fetch cart:", err);
-        toast.error("Could not load cart");
-      }
-    };
+    const data = await res.json();
+    setCartItems(data.items);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error("Failed to fetch cart:", err.message);
+      toast.error(err.message);
+    } else {
+      console.error("Failed to fetch cart:", err);
+      toast.error("Could not load cart");
+    }
+  }
+};
+
 
     fetchCart();
   }, [jwt]);
@@ -191,7 +197,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     // Remove from cartItems in localStorage
     const storedCart = JSON.parse(localStorage.getItem("cartItems") || "[]");
     const updatedCart = storedCart.filter(
-      (item: any) => !(item.id === id && item.variant === variant)
+      (item : CartItem) => !(item.id === id && item.variant === variant)
     );
     localStorage.setItem("cartItems", JSON.stringify(updatedCart));
 

@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const res = await fetch("https://ecommerce-j5j0.onrender.com/api/products/new");
 
