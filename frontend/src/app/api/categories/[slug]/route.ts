@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// ✅ Don't manually type the second argument, let Next.js handle it
 export async function GET(
   request: NextRequest,
-  context: { params: { slug: string } }
+  { params }: { params: { slug: string } }
 ) {
-  const { slug } = context.params; // ✅ No await, it's already available
+  const { slug } = params;
 
   try {
     const backendRes = await fetch(
-      `https://ecommerce-j5j0.onrender.com/api/categories/${encodeURIComponent(
-        slug
-      )}`,
+      `https://ecommerce-j5j0.onrender.com/api/categories/${encodeURIComponent(slug)}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
