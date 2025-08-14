@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
-interface RouteParams {
-  slug: string;
-}
-
-interface Context {
-  params: RouteParams;
-}
-
 export async function GET(
   request: NextRequest,
-  { params }: Context // Apply the Context interface here
+  { params }: { params: { slug: string } }
 ) {
-  const { slug } = params; // Now params is correctly typed as RouteParams
+  const { slug } = params;
 
   try {
     const backendRes = await fetch(
