@@ -9,6 +9,27 @@ declare global {
   }
 }
 
+interface RazorpayOrder {
+  id: string;
+  amount: number;
+  currency: string;
+}
+
+interface RazorpayPaymentFailedResponse {
+  error: {
+    code: string;
+    description: string;
+    source: string;
+    step: string;
+    reason: string;
+    metadata: {
+      order_id: string;
+      payment_id: string;
+    };
+  };
+}
+
+
 interface PaymentSectionProps {
   amount: number; // INR
 }
@@ -52,10 +73,11 @@ interface RazorpayOptions {
 interface RazorpayInstance {
   on: (
     event: string,
-    callback: (response: Record<string, any>) => void
+    callback: (response: RazorpayPaymentFailedResponse) => void
   ) => void;
   open: () => void;
 }
+
 
 const PaymentSection: React.FC<PaymentSectionProps> = ({ amount }) => {
   const [isRazorpayLoaded, setIsRazorpayLoaded] = useState(false);
@@ -99,7 +121,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ amount }) => {
         throw new Error(errorData.error || `Backend error: ${res.status}`);
       }
 
-      const data: { order: any; key_id: string } = await res.json();
+      const data: { order: RazorpayOrder; key_id: string } = await res.json();
       const { order, key_id } = data;
 
       const options: RazorpayOptions = {
