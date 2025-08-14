@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  context: Readonly<{ params: { slug: string } }>
+  context: { params: { slug: string } }
 ) {
-  const { slug } = context.params;
+  const { slug } = context.params; // ✅ No await, it's already available
 
   try {
     const backendRes = await fetch(
@@ -13,9 +13,7 @@ export async function GET(
       )}`,
       {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       }
     );
 
