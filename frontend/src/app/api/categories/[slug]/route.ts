@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
-interface RouteContext<P extends Record<string, string>> {
-  params: P;
-}
-
 export async function GET(
   request: NextRequest,
-  context: RouteContext<{ slug: string }>
+  { params }: { params: { slug: string } }
 ) {
-  const { slug } = context.params;
+  const { slug } = params;
 
   try {
     const backendRes = await fetch(
