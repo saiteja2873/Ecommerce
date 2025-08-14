@@ -1,11 +1,16 @@
-// app/components/not-found/notFoundClient.tsx
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function NotFoundClient() {
   const searchParams = useSearchParams();
-  const errorCode = searchParams.get("code");
+  const [errorCode, setErrorCode] = useState<string | null>(null);
+
+  // Only read search params after the component mounts in the browser
+  useEffect(() => {
+    setErrorCode(searchParams.get("code"));
+  }, [searchParams]);
 
   return (
     <div>
