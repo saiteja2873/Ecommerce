@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 
+interface RouteContext<P extends Record<string, string>> {
+  params: P;
+}
+
 export async function GET(
   request: NextRequest,
-  context: { params: { slug: string } }
+  context: RouteContext<{ slug: string }>
 ) {
   const { slug } = context.params;
 
   try {
     const backendRes = await fetch(
-      `https://ecommerce-j5j0.onrender.com/api/categories/${slug}`,
+      `https://ecommerce-j5j0.onrender.com/api/categories/${encodeURIComponent(
+        slug
+      )}`,
       {
         method: "GET",
         headers: {
@@ -24,7 +30,7 @@ export async function GET(
       );
     }
 
-    const data = await backendRes.json();
+    const data: { products: unknown } = await backendRes.json();
     return NextResponse.json({ products: data.products });
   } catch (error) {
     console.error("Error fetching from backend:", error);
