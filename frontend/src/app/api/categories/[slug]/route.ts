@@ -1,20 +1,21 @@
-// src/app/api/categories/[slug]/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } } // Destructure params directly from context
+  context: { params: { slug: string } }
 ) {
-  const { slug } = await Promise.resolve(params);
+  const { slug } = context.params;
 
   try {
-    const backendRes = await fetch(`https://ecommerce-j5j0.onrender.com/api/categories/${slug}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const backendRes = await fetch(
+      `https://ecommerce-j5j0.onrender.com/api/categories/${slug}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!backendRes.ok) {
       return NextResponse.json(
@@ -24,7 +25,6 @@ export async function GET(
     }
 
     const data = await backendRes.json();
-
     return NextResponse.json({ products: data.products });
   } catch (error) {
     console.error("Error fetching from backend:", error);
