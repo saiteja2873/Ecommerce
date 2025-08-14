@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Define params as a Promise per official Next.js v15 convention
-type Params = Promise<{ id: string }>;
+export async function GET(request: NextRequest) {
+  // Get full URL
+  const url = new URL(request.url);
 
-export async function GET(
-  request: NextRequest,
-  context: { params: Params }
-): Promise<NextResponse> {
-  const { id } = await context.params;
+  // Extract pathname segments
+  const segments = url.pathname.split("/");
+
+  // Assuming route: /api/products/[id]
+  const id = segments[segments.length - 1];
 
   try {
     const backendRes = await fetch(
       `https://ecommerce-j5j0.onrender.com/api/products/${encodeURIComponent(id)}`,
       {
+        method: "GET",
         headers: { "Content-Type": "application/json" },
       }
     );
@@ -26,8 +28,8 @@ export async function GET(
 
     const data = await backendRes.json();
     return NextResponse.json(data);
-  } catch (err) {
-    console.error("Error fetching from backend:", err);
+  } catch (error) {
+    console.error("Error fetching from backend:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
