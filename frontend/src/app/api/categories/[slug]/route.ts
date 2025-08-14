@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
-type RouteContext = {
-  params: {
-    slug: string;
-  };
-};
-
-export async function GET(request: NextRequest, context: RouteContext) {
-  const { slug } = context.params;
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<NextResponse> {
+  const { slug } = await params;
 
   try {
     const backendRes = await fetch(
