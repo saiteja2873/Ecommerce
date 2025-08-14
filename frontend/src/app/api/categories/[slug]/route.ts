@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// ✅ Don't manually type the second argument, let Next.js handle it
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { slug: string } }
-) {
-  const { slug } = params;
+type RouteContext = {
+  params: {
+    slug: string;
+  };
+};
+
+export async function GET(request: NextRequest, context: RouteContext) {
+  const { slug } = context.params;
 
   try {
     const backendRes = await fetch(
