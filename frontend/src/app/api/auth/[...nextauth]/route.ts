@@ -50,8 +50,8 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email ?? null;
         session.user.name = token.name ?? null;
         session.user.image = token.image ?? null;
-        (session.user as any).role = token.role;
-        (session.user as any).backendToken = token.backendToken;
+        session.user.role = token.role;
+        session.user.backendToken = token.backendToken;
       }
       return session;
     },
