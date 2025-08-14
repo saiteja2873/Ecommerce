@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest, context: { params: { slug: string } }) {
-  const { params } = context;
-  const { slug } = params;
+export async function GET(request: NextRequest, context: any) {
+  const { slug } = context.params;
 
   try {
     const backendRes = await fetch(
